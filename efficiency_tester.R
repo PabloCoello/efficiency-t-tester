@@ -40,6 +40,15 @@ get_t_test_pvalue = function(reference, x, confidence){
   return(array)
 }
 
-a = get_t_test_pvalue(reference=teradial_prod_crs, x=SFA_c_c, confidence = 0.95)
+
+get_t_test_periods_match = function(pvalues_array, periods, confidence){
+  periods = array(pvalues_array[,c(1:periods)])
+  match = length(periods[which(periods<confidence)])/length(periods)
+  return(match)
+}
+
+
+pvalues_array = get_t_test_pvalue(reference=teradial_prod_crs, x=SFA_c_c, confidence = 0.95)
+periods_match = get_t_test_periods_match(pvalues_array, periods = 120, confidence = 0.95)
 
 
