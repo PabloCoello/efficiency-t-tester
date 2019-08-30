@@ -1,6 +1,6 @@
 library(readxl)
 library(stats)
-
+rm(list=ls())
 
 split_in_variables = function(df, periods, dmu){
     variable = df
@@ -39,14 +39,23 @@ get_t_test_periods_match = function(pvalues_array, periods, confidence){
 }
 
 
-get_t_test_dmu_match =function(pvalues_array, dmu, confidence){
+get_t_test_dmu_match = function(pvalues_array, dmu, confidence){
   dmu_pvalues = pvalues_array[c((length(pvalues_array)-dmu):length(pvalues_array))]
   match = length(dmu_pvalues[which(dmu_pvalues>(1-confidence))])/length(dmu_pvalues)
   return(match)
 }
 
+get_result_matrix = function(df, reference, confidence, periods, dmu){
+  result_matrix = data.frame(matrix(ncol = ncol(data), nrow = 2), row.names = c("periods match", "dmu match"))
+  colnames(result_matrix)=names(data)
+  for (i in names(data)){
+    pvalues_array = get_t_test_pvalue(reference, x=get(i), confidence)
+    result_matrix[1,i] = get_t_test_periods_match(pvalues_array, periods, confidence)
+    result_matrix[2,i] = get_t_test_dmu_match(pvalues_array, dmu, confidence)
+  }
+  return(result_matrix)
+}
 
-rm(list=ls())
 setwd("C:/Users/epiph/OneDrive - Universidade de Santiago de Compostela/Proyecto MyCoast/Datos procesados")
 panel_data<- read_excel("panel_data_2.xlsx")
 data = panel_data[,c(127,128,129,130,131)]
@@ -55,9 +64,10 @@ data = panel_data[,c(127,128,129,130,131)]
 for (i in 1:length(data)){
   assign(names(data)[i], split_in_variables(df=data[,i], periods=120, dmu=28))
 }
+result_matrix = get_result_matrix(df=data, reference=teradial_prod_crs, confidence = 0.95, periods = 120, dmu=28)
 
-pvalues_array = get_t_test_pvalue(reference=teradial_prod_crs, x=SFA_c_c, confidence = 0.95)
-periods_match = get_t_test_periods_match(pvalues_array, periods = 120, confidence = 0.95)
-dmu_match = get_t_test_dmu_match(pvalues_array, dmu=28, confidence = 0.95)
+
+
+
 
 
