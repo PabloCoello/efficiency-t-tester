@@ -1,10 +1,6 @@
 library(readxl)
 library(stats)
 
-rm(list=ls())
-setwd("C:/Users/epiph/OneDrive - Universidade de Santiago de Compostela/Proyecto MyCoast/Datos procesados")
-panel_data<- read_excel("panel_data_2.xlsx")
-data = panel_data[,c(127,128,129,130,131)]
 
 split_in_variables = function(df, periods, dmu){
     variable = df
@@ -22,11 +18,6 @@ split_in_variables = function(df, periods, dmu){
     return(toret)
   }
 
-for (i in 1:length(data)){
-  assign(names(data)[i], split_in_variables(df=data[,i], periods=120, dmu=28))
-}
-
-
 get_t_test_pvalue = function(reference, x, confidence){
   array=matrix(nrow=1, ncol=ncol(reference)+nrow(reference))
   for (i in 1:ncol(reference)){
@@ -37,18 +28,36 @@ get_t_test_pvalue = function(reference, x, confidence){
     t=t.test(x=reference[j,], y=x[j,], conf.level = confidence)
     array[,ncol(reference)+j]=t$p.value
   }
-  return(array)
+  return(array(array))
 }
 
 
 get_t_test_periods_match = function(pvalues_array, periods, confidence){
-  periods = array(pvalues_array[,c(1:periods)])
-  match = length(periods[which(periods<confidence)])/length(periods)
+  periods = pvalues_array[1:periods]
+  match = length(periods[which(periods>(1-confidence))])/length(periods)
   return(match)
 }
 
 
+get_t_test_dmu_match =function(pvalues_array, dmu, confidence){
+  dmu_pvalues = pvalues_array[c((length(pvalues_array)-dmu):length(pvalues_array))]
+  match = length(dmu_pvalues[which(dmu_pvalues>(1-confidence))])/length(dmu_pvalues)
+  return(match)
+}
+
+
+rm(list=ls())
+setwd("C:/Users/epiph/OneDrive - Universidade de Santiago de Compostela/Proyecto MyCoast/Datos procesados")
+panel_data<- read_excel("panel_data_2.xlsx")
+data = panel_data[,c(127,128,129,130,131)]
+
+
+for (i in 1:length(data)){
+  assign(names(data)[i], split_in_variables(df=data[,i], periods=120, dmu=28))
+}
+
 pvalues_array = get_t_test_pvalue(reference=teradial_prod_crs, x=SFA_c_c, confidence = 0.95)
 periods_match = get_t_test_periods_match(pvalues_array, periods = 120, confidence = 0.95)
+dmu_match = get_t_test_dmu_match(pvalues_array, dmu=28, confidence = 0.95)
 
 
