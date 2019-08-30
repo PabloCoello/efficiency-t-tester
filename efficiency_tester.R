@@ -1,4 +1,5 @@
 library(readxl)
+library(stats)
 
 rm(list=ls())
 setwd("C:/Users/epiph/OneDrive - Universidade de Santiago de Compostela/Proyecto MyCoast/Datos procesados")
@@ -24,4 +25,21 @@ split_in_variables = function(df, periods, dmu){
 for (i in 1:length(data)){
   assign(names(data)[i], split_in_variables(df=data[,i], periods=120, dmu=28))
 }
+
+
+get_t_test_pvalue = function(reference, x, confidence){
+  array=matrix(nrow=1, ncol=ncol(reference)+nrow(reference))
+  for (i in 1:ncol(reference)){
+    t=t.test(x=reference[,i], y=x[,i], conf.level = confidence)
+    array[,i]=t$p.value
+  }
+  for (j in 1:nrow(reference)){
+    t=t.test(x=reference[j,], y=x[j,], conf.level = confidence)
+    array[,ncol(reference)+j]=t$p.value
+  }
+  return(array)
+}
+
+a = get_t_test_pvalue(reference=teradial_prod_crs, x=SFA_c_c, confidence = 0.95)
+
 
