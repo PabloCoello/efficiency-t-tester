@@ -81,7 +81,7 @@ get_annual_sum = function(x, periods, dmu){
   for (i in 1:nrow(x)){
     counterrow = 0
     countercol = 0
-    for (j in ncol(x)){
+    for (j in 1:ncol(x)){
       counterrow = counterrow+1
       array[counterrow] = x[i,j]
       if (counterrow==12){
@@ -100,9 +100,6 @@ data <- read_excel("efficiency_matrix.xlsx")
 
 for (i in 1:length(data)){
   assign(names(data)[i], split_in_variables(df=data[,i], periods=120, dmu=28))
-  #assign(paste(names(data)[i],"sum",sep="_"), get_annual_sum(x=get(names(data)[i]), periods=120, dmu=28))
-}
-for (i in 1:length(data)){
   assign(paste("sum",names(data)[i],sep="_"), get_annual_sum(x=get(names(data)[i]), periods=120, dmu=28))
 }
 
