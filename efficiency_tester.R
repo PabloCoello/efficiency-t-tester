@@ -75,13 +75,37 @@ get_result_matrix = function(df, reference, confidence, periods, dmu){
   return(result_matrix)
 }
 
+get_annual_sum = function(x, periods, dmu){
+  toret = matrix(ncol=periods/12, nrow=dmu)
+  array = array(dim=12)
+  for (i in 1:nrow(x)){
+    counterrow = 0
+    countercol = 0
+    for (j in ncol(x)){
+      counterrow = counterrow+1
+      array[counterrow] = x[i,j]
+      if (counterrow==12){
+        counterrow = 0
+        countercol = countercol+1
+        toret[i,countercol] = sum(array)/length(array)
+      }
+    }
+  }
+  return(toret)
+}
+
 setwd("C:/Users/epiph/OneDrive - Universidade de Santiago de Compostela/Proyecto MyCoast/Datos procesados")
 data <- read_excel("efficiency_matrix.xlsx")
 
 
 for (i in 1:length(data)){
   assign(names(data)[i], split_in_variables(df=data[,i], periods=120, dmu=28))
+  #assign(paste(names(data)[i],"sum",sep="_"), get_annual_sum(x=get(names(data)[i]), periods=120, dmu=28))
 }
+for (i in 1:length(data)){
+  assign(paste("sum",names(data)[i],sep="_"), get_annual_sum(x=get(names(data)[i]), periods=120, dmu=28))
+}
+
 (result_matrix_total_traffic = get_result_matrix(df=data, reference=tbc_crs_wages_R, confidence = 0.95, periods = 120, dmu=28))
 
 
