@@ -65,10 +65,10 @@ get_result_matrix = function(df, reference, confidence, periods, dmu){
   colnames(result_matrix) = c("t.test periods match", "t.test dmu match",
                 "wilcox.test periods match"," wilcox.test dmu match")
   for (i in names(data)){
-    pvalues_array = get_t_test_pvalue(reference, x=get(i), confidence)
+    pvalues_array = get_t_test_pvalue(reference, x=get(paste("sum_",i,sep="")), confidence)
     result_matrix[i,1] = get_test_periods_match(pvalues_array, periods, confidence)
     result_matrix[i,2] = get_test_dmu_match(pvalues_array, dmu, confidence)
-    pvalues_array = get_wilcox_test_pvalue(reference, x=get(i), confidence)
+    pvalues_array = get_wilcox_test_pvalue(reference, x=get(paste("sum_",i,sep="")), confidence)
     result_matrix[i,3] = get_test_periods_match(pvalues_array, periods, confidence)
     result_matrix[i,4] = get_test_dmu_match(pvalues_array, dmu, confidence)
   }
@@ -94,17 +94,20 @@ get_annual_sum = function(x, periods, dmu){
   return(toret)
 }
 
-setwd("C:/Users/epiph/OneDrive - Universidade de Santiago de Compostela/Proyecto MyCoast/Datos procesados")
-data <- read_excel("efficiency_matrix.xlsx")
+setwd("C:/Users/epiph/OneDrive/Desktop/Reunion 17-09-2019")
+data <- read_excel("Result_matrix17-09-2019.xlsx")
 
+correlations = cor(data)
+pairs(data, panel = panel.smooth)
 
 for (i in 1:length(data)){
   assign(names(data)[i], split_in_variables(df=data[,i], periods=120, dmu=28))
   assign(paste("sum",names(data)[i],sep="_"), get_annual_sum(x=get(names(data)[i]), periods=120, dmu=28))
 }
 
-(result_matrix_total_traffic = get_result_matrix(df=data, reference=tbc_crs_wages_R, confidence = 0.95, periods = 120, dmu=28))
+(result_matrix_total_traffic = get_result_matrix(df=data, reference=sum_teradial_vrs, confidence = 0.95, periods = 10, dmu=28))
 
 
 #write.csv2(x=result_matrix_fish,file="matrix_liquid_fish.csv")
 #t.test(x=COBB_c[,1],y=teradialbc_prod_crs_hetero[,1])
+save.image("ttest.RData")
