@@ -58,13 +58,13 @@ get_result_matrix = function(df, reference, confidence, periods, dmu){
 
 setwd("C:/Users/epiph/OneDrive - Universidade de Santiago de Compostela/Proyecto MyCoast/Datos procesados")
 panel_data<- read_excel("panel_data_2.xlsx")
-data = panel_data[,c(127,128,129,130,131)]
+data = panel_data[,c(127,128,129,130,131,132,133,134,135)]
 
 
 for (i in 1:length(data)){
   assign(names(data)[i], split_in_variables(df=data[,i], periods=120, dmu=28))
 }
-result_matrix = get_result_matrix(df=data, reference=teradial_prod_crs, confidence = 0.95, periods = 120, dmu=28)
+(result_matrix = get_result_matrix(df=data, reference=teradial_prod_crs, confidence = 0.95, periods = 120, dmu=28))
 
 
 
